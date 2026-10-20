@@ -1,0 +1,56 @@
+name: Update LPL LCK International Calendar
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: calendar-refresh
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify filter logic
+        run: python -m unittest discover -s tests -v
+      - name: Fetch and filter latest schedule
+        run: python src/generate.py
+      - name: Commit calendar if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/lpl-lck-all-matches.ics
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: refresh LPL and LCK match calendar"
+            git push
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lpl-lck-ics
+          path: public/lpl-lck-all-matches.ics
+
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+      - name: Deploy calendar to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
