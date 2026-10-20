@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LPL/LCK team-filtered iCalendar. Only standard-library dependencies."""
+"""LPL/LCK + G2 team-filtered iCalendar, excluding AL."""
 from __future__ import annotations
 
 import json
@@ -19,6 +19,10 @@ BASE_URLS = (
     "https://prod-relapi.ewp.gg/persisted/gw",
 )
 REGIONS = ("lpl", "lck")
+EXCLUDED_TEAM_CODES = {"al"}
+EXCLUDED_TEAM_NAMES = {"anyone's legend", "anyones legend", "anyone’s legend"}
+ADDED_TEAM_CODES = {"g2"}
+ADDED_TEAM_NAMES = {"g2 esports"}
 INTERNATIONAL = ("msi", "worlds", "first_stand", "ewc_lol", "demacia_cup")
 ALL = REGIONS + INTERNATIONAL
 LABELS = {
@@ -145,11 +149,31 @@ def roster_from_events(events, now=None):
     return roster
 
 
+def is_excluded(team):
+    """Always exclude AL, even if the opponent belongs to a selected region."""
+    if not isinstance(team, dict):
+        return False
+    code = str(team.get("code") or "").strip().casefold()
+    name = str(team.get("name") or "").strip().casefold()
+    return code in EXCLUDED_TEAM_CODES or name in EXCLUDED_TEAM_NAMES
+
+
+def is_added(team):
+    """Include G2 even in games with no LPL/LCK opponent."""
+    if not isinstance(team, dict):
+        return False
+    code = str(team.get("code") or "").strip().casefold()
+    name = str(team.get("name") or "").strip().casefold()
+    return code in ADDED_TEAM_CODES or name in ADDED_TEAM_NAMES
+
+
 def include(event, slug, roster):
+    teams = (event.get("match") or {}).get("teams") or []
+    if any(is_excluded(team) for team in teams):
+        return False
     if slug in REGIONS:
         return True
-    teams = (event.get("match") or {}).get("teams") or []
-    return any(identities(team) & roster for team in teams)
+    return any(is_added(team) or identities(team) & roster for team in teams)
 
 
 def clean(s):
@@ -194,23 +218,28 @@ def render(rows, now=None):
         def name(t):
             return str(t.get("code") or t.get("name") or "待定").strip()
         labels = [name(t) for t in teams[:2]]
-        title = " vs ".join(labels) if len(labels) == 2 else "对阵待定"
+        title = " vs ".join(labels) if len(labels) == 2 else "待定"
         if e.get("state") == "completed" and len(teams) >= 2:
             wins = [(t.get("result") or {}).get("gameWins") for t in teams[:2]]
             if all(v is not None for v in wins):
-                title = f"{labels[0]} {wins[0]}:{wins[1]} {labels[1]}"
+                title = f"{labels[0]} {wins[0]}-{wins[1]} {labels[1]}"
         try:
             best_of = int((match.get("strategy") or {}).get("count") or 0)
         except (ValueError, TypeError):
             best_of = 0
         duration = {1: 1, 2: 2, 3: 3, 5: 4.5}.get(best_of, 2)
-        details = ["赛事：" + LABELS.get(slug, slug.upper())]
-        if e.get("blockName"):
-            details.append("阶段：" + str(e["blockName"]))
+        # Follow hh-io intl.ics display style while keeping a custom team filter.
+        league = str((e.get("league") or {}).get("name") or LABELS.get(slug, slug.upper()))
+        prefix = {"worlds": "Worlds", "ewc_lol": "EWC"}.get(slug, league)
+        block = str(e.get("blockName") or "")
+        summary = f"{prefix}: {title}" + (f" ({block})" if block else "")
+        details = ["赛区: " + league]
+        if block:
+            details.append("阶段: " + block)
         if best_of:
-            details.append(f"赛制：BO{best_of}")
+            details.append(f"赛制: BO{best_of}")
         if len(teams) >= 2:
-            details.append("对阵：" + str(teams[0].get("name", "待定")) +
+            details.append("对阵: " + str(teams[0].get("name", "待定")) +
                            " vs " + str(teams[1].get("name", "待定")))
         lines = [
             "BEGIN:VEVENT",
@@ -218,7 +247,7 @@ def render(rows, now=None):
             "DTSTAMP:" + timestamp(start),
             "DTSTART:" + timestamp(start),
             "DTEND:" + timestamp(start + timedelta(hours=duration)),
-            "SUMMARY:" + clean(LABELS.get(slug, slug.upper()) + "｜" + title),
+            "SUMMARY:" + clean(summary),
             "DESCRIPTION:" + clean("\n".join(details)),
             "END:VEVENT",
         ]
@@ -227,7 +256,7 @@ def render(rows, now=None):
     all_lines = [
         "BEGIN:VCALENDAR", "VERSION:2.0", "CALSCALE:GREGORIAN",
         "PRODID:-//LPL-LCK-Calendar//ZH-CN//", "METHOD:PUBLISH",
-        "X-WR-CALNAME:英雄联盟｜LPL·LCK 全赛事", "X-WR-TIMEZONE:UTC",
+        "X-WR-CALNAME:LOL 赛程 · LPL/LCK/G2 (不含 AL)", "X-WR-TIMEZONE:UTC",
         "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H",
     ]
     for _, lines in events:
@@ -253,7 +282,7 @@ def run():
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != text:
         OUTPUT.write_text(text, encoding="utf-8", newline="")
-    print(f"[OK] {count} matches, {len(roster)} team identity keys")
+    print(f"[OK] {count} matches (LPL/LCK + G2, AL excluded), {len(roster)} team identity keys")
 
 
 if __name__ == "__main__":
