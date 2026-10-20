@@ -218,26 +218,29 @@ def render(rows, now=None):
         def name(t):
             return str(t.get("code") or t.get("name") or "待定").strip()
         labels = [name(t) for t in teams[:2]]
+        # Keep titles short even after a match ends.
         title = " vs ".join(labels) if len(labels) == 2 else "待定"
+        score = None
         if e.get("state") == "completed" and len(teams) >= 2:
             wins = [(t.get("result") or {}).get("gameWins") for t in teams[:2]]
             if all(v is not None for v in wins):
-                title = f"{labels[0]} {wins[0]}-{wins[1]} {labels[1]}"
+                score = f"{wins[0]}-{wins[1]}"
         try:
             best_of = int((match.get("strategy") or {}).get("count") or 0)
         except (ValueError, TypeError):
             best_of = 0
         duration = {1: 1, 2: 2, 3: 3, 5: 4.5}.get(best_of, 2)
-        # Follow hh-io intl.ics display style while keeping a custom team filter.
+        # Title is only "TEAM vs TEAM"; detailed event metadata stays inside description.
         league = str((e.get("league") or {}).get("name") or LABELS.get(slug, slug.upper()))
-        prefix = {"worlds": "Worlds", "ewc_lol": "EWC"}.get(slug, league)
         block = str(e.get("blockName") or "")
-        summary = f"{prefix}: {title}" + (f" ({block})" if block else "")
+        summary = title
         details = ["赛区: " + league]
         if block:
             details.append("阶段: " + block)
         if best_of:
             details.append(f"赛制: BO{best_of}")
+        if score is not None:
+            details.append("比分: " + score)
         if len(teams) >= 2:
             details.append("对阵: " + str(teams[0].get("name", "待定")) +
                            " vs " + str(teams[1].get("name", "待定")))
