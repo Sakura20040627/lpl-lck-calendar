@@ -1,6 +1,12 @@
 name: Update LPL LCK International Calendar
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '.github/workflows/update.yml'
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
