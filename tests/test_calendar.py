@@ -32,9 +32,27 @@ class CalendarTests(unittest.TestCase):
         e = match("i1", "G2 Esports", "G2", "300", "Gen.G", "GEN", "100")
         self.assertTrue(include(e, "worlds", self.roster))
 
-    def test_foreign_only_international_is_excluded(self):
+    def test_g2_international_is_kept_without_lpl_lck(self):
         e = match("i2", "G2 Esports", "G2", "300", "Fnatic", "FNC", "301")
+        self.assertTrue(include(e, "worlds", self.roster))
+
+    def test_foreign_only_international_is_excluded(self):
+        e = match("i4", "Cloud9", "C9", "302", "Fnatic", "FNC", "301")
         self.assertFalse(include(e, "worlds", self.roster))
+
+    def test_al_own_lpl_game_is_excluded(self):
+        e = match("r9", "Anyone's Legend", "AL", "900", "Bilibili Gaming", "BLG", "200")
+        self.assertFalse(include(e, "lpl", self.roster))
+
+    def test_al_vs_lck_or_g2_is_excluded(self):
+        e = match("i9", "Anyone's Legend", "AL", "900", "G2 Esports", "G2", "300")
+        self.assertFalse(include(e, "worlds", self.roster))
+        e2 = match("i10", "Gen.G", "GEN", "100", "Anyone's Legend", "AL", "900")
+        self.assertFalse(include(e2, "msi", self.roster))
+
+    def test_g2_full_name_fallback_is_kept(self):
+        e = match("i5", "G2 Esports", "TBD", "300", "Cloud9", "C9", "302")
+        self.assertTrue(include(e, "worlds", self.roster))
 
     def test_all_regional_matches_are_kept(self):
         e = match("r3", "TBD", "TBD", "", "TBD", "TBD", "")
@@ -45,12 +63,22 @@ class CalendarTests(unittest.TestCase):
         e = match("i3", "TBD", "TBD", "100", "TBD", "TBD", "200")
         self.assertFalse(include(e, "msi", self.roster))
 
+    def test_completed_match_follows_intl_score_format(self):
+        e = match("done", "Gen.G", "GEN", "100", "Top Esports", "TES", "201")
+        e["state"] = "completed"
+        e["match"]["teams"][0]["result"] = {"gameWins": 3}
+        e["match"]["teams"][1]["result"] = {"gameWins": 1}
+        result, _ = render([("worlds", e)], NOW)
+        self.assertIn("SUMMARY:Worlds: GEN 3-1 TES", result)
+
     def test_ics_can_be_imported_and_lines_fit_rfc(self):
         e = match("i1", "G2 Esports", "G2", "300", "Gen.G", "GEN", "100")
         result, count = render([("worlds", e)], NOW)
         self.assertEqual(count, 1)
         self.assertIn("DTSTART:20261024T120000Z", result)
-        self.assertIn("全球总决赛", result)
+        self.assertIn("SUMMARY:Worlds: G2 vs GEN", result)
+        self.assertIn("赛区: 全球总决赛", result)
+        self.assertIn("赛制: BO3", result)
         self.assertIn("UID:lolmatch-i1@lpl-lck-calendar", result)
         self.assertTrue(all(len(line.encode("utf-8")) <= 75 for line in result.split("\r\n") if line))
 
