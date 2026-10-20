@@ -15,13 +15,10 @@ https://raw.githubusercontent.com/Sakura20040627/lpl-lck-calendar/main/public/lp
 
 ## 日历显示格式
 
-沿用原项目 [hh-io/lol-esports-calendar](https://github.com/hh-io/lol-esports-calendar) 的 `intl.ics` 呈现习惯：
-
-- 比赛开始前：`Worlds: GEN vs IG (瑞士轮)`
-- 比赛结束后：`Worlds: GEN 1-0 IG (瑞士轮)`（示例比分，非实际赛果）
-- 内容：`赛区: Worlds`、`阶段: 瑞士轮`、`赛制: BO1`、`对阵: Gen.G Esports vs Invictus Gaming`
-- 时间使用 UTC 编码，iPhone 会以日本等手机设定时区自动显示本地时间。
-- 保持旧日历事件 UID，避免订阅更新产生重复条目。
+- 比赛标题只显示队伍缩写，如 `G2 vs DK`、`GEN vs IG`、`T1 vs BLG`。
+- 已结束比赛仍保持 `GEN vs TES`，实际比分在详情的「比分」字段显示。
+- 详情保留「赛区、阶段、赛制、对阵」和已结束场次的比分。
+- 订阅 URL、赛事 UID 和 UTC 时区处理不变，不需要重新订阅。
 
 ## 自动更新
 
