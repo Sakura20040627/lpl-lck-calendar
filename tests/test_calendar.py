@@ -36,6 +36,12 @@ class CalendarTests(unittest.TestCase):
         e = match("i2", "G2 Esports", "G2", "300", "Fnatic", "FNC", "301")
         self.assertTrue(include(e, "worlds", self.roster))
 
+    def test_g2_lec_matches_only(self):
+        g2 = match("e1", "G2 Esports", "G2", "300", "Fnatic", "FNC", "301")
+        other = match("e2", "Fnatic", "FNC", "301", "Karmine Corp", "KC", "302")
+        self.assertTrue(include(g2, "lec", self.roster))
+        self.assertFalse(include(other, "lec", self.roster))
+
     def test_foreign_only_international_is_excluded(self):
         e = match("i4", "Cloud9", "C9", "302", "Fnatic", "FNC", "301")
         self.assertFalse(include(e, "worlds", self.roster))
