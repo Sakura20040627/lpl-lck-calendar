@@ -13,8 +13,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: calendar-refresh
@@ -46,17 +44,3 @@ jobs:
           name: lpl-lck-ics
           path: public/lpl-lck-all-matches.ics
 
-  deploy:
-    needs: update
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
-      - name: Deploy calendar to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
