@@ -9,9 +9,9 @@
 
 ## iPhone 订阅网址
 
-https://sakura20040627.github.io/lpl-lck-calendar/lpl-lck-all-matches.ics
+https://raw.githubusercontent.com/Sakura20040627/lpl-lck-calendar/main/public/lpl-lck-all-matches.ics
 
-**原有网址保持不变。** 已成功订阅的 iPhone 用户不必再次加入，Apple 重新抓取订阅文件后就会同步变化。日历颜色可用黄色 `FFD447`。
+**已確認可使用的原始檔訂閱網址保持不變。** 已成功订阅的 iPhone 用户不必再次加入，Apple 重新抓取订阅文件后就会同步变化。日历颜色可用黄色 `FFD447`。
 
 ## 日历显示格式
 
@@ -25,6 +25,6 @@ https://sakura20040627.github.io/lpl-lck-calendar/lpl-lck-all-matches.ics
 
 ## 自动更新
 
-GitHub Actions 每小时 **尝试**从 LoL Esports 非官方公开接口更新；调度可能延迟，Apple 订阅端也可能存在缓存刷新延迟。运行失败时旧文件保留。通过 [Actions 页面](https://github.com/Sakura20040627/lpl-lck-calendar/actions) 查看更新是否成功。
+GitHub Actions 每小时 **尝试**从 LoL Esports 非官方公开接口更新，并将新的 ICS 内容提交到 main 分支；调度可能延迟，Apple 订阅端也可能存在缓存刷新延迟。运行失败时旧文件保留。通过 [Actions 页面](https://github.com/Sakura20040627/lpl-lck-calendar/actions) 查看更新是否成功。
 
 数据依赖 LoL Esports 比赛公开资料；队伍更名或接口发生变更时，可能暂时漏掉部分场次。非 Riot 官方项目。
