@@ -75,14 +75,16 @@ class CalendarTests(unittest.TestCase):
         e["match"]["teams"][0]["result"] = {"gameWins": 3}
         e["match"]["teams"][1]["result"] = {"gameWins": 1}
         result, _ = render([("worlds", e)], NOW)
-        self.assertIn("SUMMARY:Worlds: GEN 3-1 TES", result)
+        self.assertIn("SUMMARY:GEN vs TES", result)
+        self.assertIn("比分: 3-1", result)
 
     def test_ics_can_be_imported_and_lines_fit_rfc(self):
         e = match("i1", "G2 Esports", "G2", "300", "Gen.G", "GEN", "100")
         result, count = render([("worlds", e)], NOW)
         self.assertEqual(count, 1)
         self.assertIn("DTSTART:20261024T120000Z", result)
-        self.assertIn("SUMMARY:Worlds: G2 vs GEN", result)
+        self.assertIn("SUMMARY:G2 vs GEN", result)
+        self.assertNotIn("SUMMARY:Worlds:", result)
         self.assertIn("赛区: 全球总决赛", result)
         self.assertIn("赛制: BO3", result)
         self.assertIn("UID:lolmatch-i1@lpl-lck-calendar", result)
