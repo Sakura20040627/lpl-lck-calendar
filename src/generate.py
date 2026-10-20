@@ -24,9 +24,9 @@ EXCLUDED_TEAM_NAMES = {"anyone's legend", "anyones legend", "anyone’s legend"}
 ADDED_TEAM_CODES = {"g2"}
 ADDED_TEAM_NAMES = {"g2 esports"}
 INTERNATIONAL = ("msi", "worlds", "first_stand", "ewc_lol", "demacia_cup")
-ALL = REGIONS + INTERNATIONAL
+ALL = REGIONS + ("lec",) + INTERNATIONAL
 LABELS = {
-    "lpl": "LPL", "lck": "LCK", "msi": "季中冠军赛",
+    "lpl": "LPL", "lck": "LCK", "lec": "LEC", "msi": "季中冠军赛",
     "worlds": "全球总决赛", "first_stand": "全球先锋赛",
     "ewc_lol": "电竞世界杯", "demacia_cup": "德玛西亚杯",
 }
@@ -68,8 +68,8 @@ def leagues():
         raise ScheduleError("missing leagues in API response")
     found = {str(x.get("slug")): str(x["id"]) for x in items
              if isinstance(x, dict) and x.get("slug") in ALL and x.get("id")}
-    if not all(region in found for region in REGIONS):
-        raise ScheduleError("LPL/LCK league IDs missing; refusing to publish")
+    if not all(region in found for region in REGIONS + ("lec",)):
+        raise ScheduleError("LPL/LCK/LEC league IDs missing; refusing to publish")
     for missing in set(ALL) - set(found):
         print(f"[WARN] League not currently available: {missing}")
     return found
