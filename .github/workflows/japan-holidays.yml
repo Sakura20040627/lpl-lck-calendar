@@ -1,0 +1,54 @@
+name: Update Japan Holidays in Chinese
+
+on:
+  schedule:
+    - cron: '41 3 5 * *'  # Monthly: monitor new Cabinet Office announcements
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/japan_holidays.py'
+      - 'tests/test_japan_holidays.py'
+      - '.github/workflows/japan-holidays.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: japan-holidays
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check holiday dates and translation rules
+        run: python -m unittest discover -s tests -p 'test_japan_holidays.py' -v
+      - name: Read official Japan Cabinet Office CSV
+        run: python src/japan_holidays.py
+      - name: Publish refreshed subscriptions
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/japan-public-holidays-zh-tw.ics public/japan-public-holidays-zh-cn.ics
+          if git diff --cached --quiet; then
+            echo "No new officially published dates."
+            exit 0
+          fi
+          git commit -m "chore: update Chinese Japanese public holiday feeds"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "Unable to update published calendar after retries"
+              exit 1
+            fi
+            sleep 3
+          done
