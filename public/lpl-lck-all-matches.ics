@@ -183,18 +183,18 @@ UID:lolmatch-115660540726095005@lpl-lck-calendar
 DTSTAMP:20261023T170000Z
 DTSTART:20261023T170000Z
 DTEND:20261023T180000Z
-SUMMARY:GEN vs IG
-DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n对阵: Gen.G E
- sports vs Invictus Gaming
+SUMMARY:IG vs GEN
+DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n比分: 0-1\n
+ 对阵: Invictus Gaming vs Gen.G Esports
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-115660540726095013@lpl-lck-calendar
 DTSTAMP:20261023T180000Z
 DTSTART:20261023T180000Z
 DTEND:20261023T190000Z
-SUMMARY:HLE vs TES
-DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n对阵: Hanwha 
- Life Esports vs TOP ESPORTS
+SUMMARY:TES vs HLE
+DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n对阵: TOP ESP
+ ORTS vs Hanwha Life Esports
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-115660540726095019@lpl-lck-calendar
