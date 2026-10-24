@@ -48,9 +48,9 @@ UID:lolmatch-115660540726095029@lpl-lck-calendar
 DTSTAMP:20261024T170000Z
 DTSTART:20261024T170000Z
 DTEND:20261024T180000Z
-SUMMARY:AL vs TES
-DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n对阵: Anyone'
- s Legend vs TOP ESPORTS
+SUMMARY:TES vs AL
+DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n比分: 1-0\n
+ 对阵: TOP ESPORTS vs Anyone's Legend
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-worlds-2026-r2-tsw-ig@lpl-lck-calendar
