@@ -58,8 +58,8 @@ DTSTAMP:20261024T210000Z
 DTSTART:20261024T210000Z
 DTEND:20261024T220000Z
 SUMMARY:TSW vs IG
-DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n对阵: Team Se
- cret Whales vs Invictus Gaming
+DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n比分: 0-1\n
+ 对阵: Team Secret Whales vs Invictus Gaming
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-worlds-2026-r2-tlaw-blg@lpl-lck-calendar
