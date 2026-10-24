@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from generate import identities, roster_from_events, include, render
+from generate import identities, roster_from_events, include, render, apply_known_worlds_round2
 
 NOW = datetime(2026, 10, 20, tzinfo=timezone.utc)
 WHEN = "2026-10-24T12:00:00Z"
@@ -89,6 +89,31 @@ class CalendarTests(unittest.TestCase):
         self.assertIn("赛制: BO3", result)
         self.assertIn("UID:lolmatch-i1@lpl-lck-calendar", result)
         self.assertTrue(all(len(line.encode("utf-8")) <= 75 for line in result.split("\r\n") if line))
+
+
+    def test_worlds_2026_round_two_fallback_keeps_only_qualified_games(self):
+        selected = {}
+        apply_known_worlds_round2(selected)
+        result, count = render(selected.values(), NOW)
+        self.assertEqual(count, 5)
+        self.assertIn("SUMMARY:G2 vs LOS", result)
+        self.assertIn("SUMMARY:TSW vs IG", result)
+        self.assertIn("SUMMARY:GEN vs HLE", result)
+        self.assertIn("SUMMARY:T1 vs DK", result)
+        self.assertIn("SUMMARY:TLAW vs BLG", result)
+        self.assertIn("DTSTART:20261024T190000Z", result)
+        self.assertNotIn("SUMMARY:AL vs TES", result)
+        self.assertNotIn("SUMMARY:CFO vs MKOI", result)
+
+    def test_worlds_round_two_late_api_event_does_not_duplicate(self):
+        upstream = match("api123", "G2 Esports", "G2", "2",
+                         "LOS", "LOS", "3", "2026-10-24T19:00:00Z")
+        selected = {"api123": ("worlds", upstream)}
+        apply_known_worlds_round2(selected)
+        result, count = render(selected.values(), NOW)
+        self.assertEqual(count, 5)
+        self.assertEqual(upstream["match"]["id"], "worlds-2026-r2-g2-los")
+        self.assertEqual(result.count("SUMMARY:G2 vs LOS"), 1)
 
 
 if __name__ == "__main__":
