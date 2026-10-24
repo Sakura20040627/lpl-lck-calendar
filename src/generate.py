@@ -268,6 +268,64 @@ def render(rows, now=None):
     return "\r\n".join(fold(line) for line in all_lines) + "\r\n", len(events)
 
 
+
+# Published Worlds 2026 Swiss Round 2 pairings and slot times (UTC).
+# Temporary, narrowly-scoped safeguard for delayed Riot schedule API updates.
+# Sources: Riot draw as reported Oct 23/24 by Sheep Esports and Inven Global;
+# match order cross-checked with published Oct 24 fixture schedules.
+# AL vs TES is expressly excluded; CFO vs MKOI and LYON vs KC do not qualify.
+WORLDS_2026_R2 = (
+    ("2026-10-24T19:00:00Z", "G2", "G2 Esports", "LOS", "LOS"),
+    ("2026-10-24T21:00:00Z", "TSW", "Team Secret Whales", "IG", "Invictus Gaming"),
+    ("2026-10-24T22:00:00Z", "GEN", "Gen.G", "HLE", "Hanwha Life Esports"),
+    ("2026-10-24T23:00:00Z", "T1", "T1", "DK", "Dplus KIA"),
+    ("2026-10-25T00:00:00Z", "TLAW", "Team Liquid Alienware", "BLG", "Bilibili Gaming"),
+)
+
+
+def apply_known_worlds_round2(selected):
+    """Backfill confirmed pairings only if the upstream event is still missing.
+
+    When upstream publishes the pairing later, prefer its actual timestamp,
+    score and metadata, but retain the fallback UID to avoid duplicate events.
+    """
+    for time_utc, ac, an, bc, bn in WORLDS_2026_R2:
+        stable_id = "worlds-2026-r2-" + ac.lower() + "-" + bc.lower()
+        pair = {ac.casefold(), bc.casefold()}
+        original = None
+        for key, (slug, event) in selected.items():
+            if slug != "worlds":
+                continue
+            try:
+                within_day = abs((dt(event["startTime"]) - dt(time_utc)).total_seconds()) < 86400
+            except (KeyError, ValueError):
+                continue
+            if not within_day:
+                continue
+            codes = {str(t.get("code", "")).strip().casefold()
+                     for t in (event.get("match") or {}).get("teams") or []}
+            if codes == pair:
+                original = key
+                break
+        if original is not None:
+            selected[original][1]["match"]["id"] = stable_id
+            continue
+        selected[stable_id] = ("worlds", {
+            "type": "match",
+            "state": "unstarted",
+            "startTime": time_utc,
+            "blockName": "瑞士轮·第二轮",
+            "league": {"name": "Worlds"},
+            "match": {
+                "id": stable_id,
+                "strategy": {"count": 1},
+                "teams": [
+                    {"code": ac, "name": an},
+                    {"code": bc, "name": bn},
+                ],
+            },
+        })
+
 def run():
     ids = leagues()
     source = {slug: fetch_matches(identifier) for slug, identifier in ids.items()}
@@ -279,6 +337,7 @@ def run():
             mid = str((event.get("match") or {}).get("id") or "")
             if mid and include(event, slug, roster):
                 selected[mid] = (slug, event)
+    apply_known_worlds_round2(selected)
     if not selected:
         raise ScheduleError("No matching games; refusing to overwrite calendar")
     text, count = render(selected.values())
