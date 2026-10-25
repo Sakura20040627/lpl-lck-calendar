@@ -75,18 +75,18 @@ UID:lolmatch-115660540726095045@lpl-lck-calendar
 DTSTAMP:20261025T170000Z
 DTSTART:20261025T170000Z
 DTEND:20261025T180000Z
-SUMMARY:HLE vs IG
-DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n对阵: Hanwha 
- Life Esports vs Invictus Gaming
+SUMMARY:IG vs HLE
+DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n比分: 1-0\n
+ 对阵: Invictus Gaming vs Hanwha Life Esports
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-115660540726095047@lpl-lck-calendar
 DTSTAMP:20261025T180000Z
 DTSTART:20261025T180000Z
 DTEND:20261025T190000Z
-SUMMARY:G2 vs TES
-DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n对阵: G2 Espo
- rts vs TOP ESPORTS
+SUMMARY:TES vs G2
+DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO1\n比分: 1-0\n
+ 对阵: TOP ESPORTS vs G2 Esports
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-115660540726095051@lpl-lck-calendar
