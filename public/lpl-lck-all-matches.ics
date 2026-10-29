@@ -112,8 +112,8 @@ DTSTAMP:20261028T230000Z
 DTSTART:20261028T230000Z
 DTEND:20261029T020000Z
 SUMMARY:LYON vs IG
-DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO3\n对阵: LYON vs
-  Invictus Gaming
+DESCRIPTION:赛区: Worlds\n阶段: 瑞士轮\n赛制: BO3\n比分: 1-2\n
+ 对阵: LYON vs Invictus Gaming
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-115660540726095069@lpl-lck-calendar
