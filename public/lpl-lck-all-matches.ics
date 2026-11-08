@@ -157,8 +157,8 @@ DTSTAMP:20261107T220000Z
 DTSTART:20261107T220000Z
 DTEND:20261108T023000Z
 SUMMARY:GEN vs IG
-DESCRIPTION:赛区: Worlds\n阶段: 半决赛\n赛制: BO5\n对阵: Gen.G E
- sports vs Invictus Gaming
+DESCRIPTION:赛区: Worlds\n阶段: 半决赛\n赛制: BO5\n比分: 3-0\n
+ 对阵: Gen.G Esports vs Invictus Gaming
 END:VEVENT
 BEGIN:VEVENT
 UID:lolmatch-115660540726095121@lpl-lck-calendar
